@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Check, CheckCircle2, Clock, Play, BookOpen, Copy, ArrowRight, Calendar, Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { WikipediaArticleRenderer } from "@/components/ui/WikipediaArticleRenderer";
 
 export interface TheoryArticleViewerProps {
   title: string;
@@ -189,8 +190,14 @@ export function TheoryArticleViewer({
             </button>
           </div>
 
-          <div className="whitespace-pre-wrap font-sans text-neutral-800 text-sm leading-relaxed space-y-3 pt-2">
-            {notes}
+          <div className="pt-2">
+            <WikipediaArticleRenderer
+              content={notes}
+              showToc={true}
+              articleMeta={{
+                category: "Computer Science Theory & Analysis",
+              }}
+            />
           </div>
         </div>
       </div>

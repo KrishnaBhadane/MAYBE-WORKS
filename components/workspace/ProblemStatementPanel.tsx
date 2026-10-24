@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CheckCircle2, Clock, Copy, HelpCircle, FileText, History } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
+import { WikipediaArticleRenderer } from "@/components/ui/WikipediaArticleRenderer";
 
 export interface SubmissionHistoryItem {
   id: string;
@@ -113,10 +114,20 @@ export function ProblemStatementPanel({
               Optimal solutions must satisfy strict time and space complexity invariants. Ensure corner cases (empty inputs, single elements, negative prefixes) are evaluated correctly.
             </div>
 
-            {/* Problem Description Body */}
-            <div className="text-sm text-neutral-900 leading-relaxed font-sans space-y-4">
-              <div className="whitespace-pre-wrap">{description}</div>
-            </div>
+            {/* Problem Description Body (Rendered in Wikipedia Report Style) */}
+            <WikipediaArticleRenderer
+              content={description}
+              showToc={true}
+              infoboxData={[
+                { label: "Domain", value: "Algorithmic Systems" },
+                { label: "Standard I/O", value: "stdin / stdout" },
+                { label: "Time Bound", value: "1.00s execution" },
+                { label: "Space Limit", value: "256 MB heap" },
+              ]}
+              articleMeta={{
+                category: "Competitive Programming & Invariants",
+              }}
+            />
 
             {/* Sample Testcases Section */}
             {sampleTestcases.length > 0 && (

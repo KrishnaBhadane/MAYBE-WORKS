@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Play, Check, BookOpen, Clock } from "lucide-react";
+import { Play, Check, Clock } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { WikipediaArticleRenderer } from "@/components/ui/WikipediaArticleRenderer";
 
 export interface TheoryViewerProps {
   title: string;
@@ -95,15 +96,15 @@ export function TheoryViewer({
         </div>
       )}
 
-      {/* Notes / Technical Documentation */}
-      <div className="prose prose-neutral max-w-none text-sm leading-relaxed border-t border-black/10 pt-4">
-        <div className="flex items-center gap-1.5 font-bold text-xs uppercase tracking-wider text-neutral-500 mb-3">
-          <BookOpen className="w-4 h-4" />
-          <span>Technical Reference</span>
-        </div>
-        <div className="whitespace-pre-wrap font-sans text-neutral-800 space-y-3">
-          {notes}
-        </div>
+      {/* Notes / Technical Documentation (Wikipedia Report Style) */}
+      <div className="border-t border-black/10 pt-4">
+        <WikipediaArticleRenderer
+          content={notes}
+          showToc={true}
+          articleMeta={{
+            category: "Technical Reference & Systems",
+          }}
+        />
       </div>
     </div>
   );
