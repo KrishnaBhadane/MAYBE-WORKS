@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, Clock, Copy, HelpCircle, FileText, History } from "lucide-react";
+import { CheckCircle2, Clock, Copy, HelpCircle, FileText, History, GitCompare } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
+import { StepComparator } from "@/components/workspace/StepComparator";
 
 export interface SubmissionHistoryItem {
   id: string;
@@ -32,7 +33,7 @@ export function ProblemStatementPanel({
   isSolved,
   submissions,
 }: ProblemStatementPanelProps) {
-  const [activeTab, setActiveTab] = useState<"statement" | "submissions" | "help">("statement");
+  const [activeTab, setActiveTab] = useState<"statement" | "submissions" | "help" | "deconstruct">("statement");
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   const handleCopyInput = (input: string, idx: number) => {
@@ -43,11 +44,11 @@ export function ProblemStatementPanel({
 
   return (
     <div className="flex flex-col h-full bg-white select-text text-black font-sans">
-      {/* Top Tab Switcher (Statement | Submissions | Help) */}
-      <div className="flex items-center gap-1 border-b-2 border-black bg-[#F8F9FA] px-4 pt-2 select-none shrink-0">
+      {/* Top Tab Switcher (Statement | Submissions | Deconstruction | Help) */}
+      <div className="flex items-center gap-1 border-b-2 border-black bg-[#F8F9FA] px-4 pt-2 select-none shrink-0 overflow-x-auto">
         <button
           onClick={() => setActiveTab("statement")}
-          className={`flex items-center gap-2 px-4 py-2 text-xs font-mono font-black border-t-2 border-x-2 rounded-t-lg transition-colors ${
+          className={`flex items-center gap-2 px-4 py-2 text-xs font-mono font-black border-t-2 border-x-2 rounded-t-lg transition-colors whitespace-nowrap ${
             activeTab === "statement"
               ? "bg-white text-black border-black -mb-[2px] z-10"
               : "bg-transparent text-neutral-600 border-transparent hover:text-black"
@@ -58,8 +59,20 @@ export function ProblemStatementPanel({
         </button>
 
         <button
+          onClick={() => setActiveTab("deconstruct")}
+          className={`flex items-center gap-2 px-4 py-2 text-xs font-mono font-black border-t-2 border-x-2 rounded-t-lg transition-colors whitespace-nowrap ${
+            activeTab === "deconstruct"
+              ? "bg-[#0D111A] text-[#FAFF00] border-black -mb-[2px] z-10"
+              : "bg-transparent text-neutral-600 border-transparent hover:text-black"
+          }`}
+        >
+          <GitCompare className="w-3.5 h-3.5" />
+          <span>Deconstruction</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab("submissions")}
-          className={`flex items-center gap-2 px-4 py-2 text-xs font-mono font-black border-t-2 border-x-2 rounded-t-lg transition-colors ${
+          className={`flex items-center gap-2 px-4 py-2 text-xs font-mono font-black border-t-2 border-x-2 rounded-t-lg transition-colors whitespace-nowrap ${
             activeTab === "submissions"
               ? "bg-white text-black border-black -mb-[2px] z-10"
               : "bg-transparent text-neutral-600 border-transparent hover:text-black"
@@ -76,7 +89,7 @@ export function ProblemStatementPanel({
 
         <button
           onClick={() => setActiveTab("help")}
-          className={`flex items-center gap-2 px-4 py-2 text-xs font-mono font-black border-t-2 border-x-2 rounded-t-lg transition-colors ${
+          className={`flex items-center gap-2 px-4 py-2 text-xs font-mono font-black border-t-2 border-x-2 rounded-t-lg transition-colors whitespace-nowrap ${
             activeTab === "help"
               ? "bg-white text-black border-black -mb-[2px] z-10"
               : "bg-transparent text-neutral-600 border-transparent hover:text-black"
@@ -230,6 +243,13 @@ export function ProblemStatementPanel({
                 <p className="text-neutral-700">Read inputs using standard streams (`std::cin` / `Scanner` / `process.stdin`). Print only the expected output value without extra prompts.</p>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* 4. DECONSTRUCTION TAB (REA REVERSE ENGINEERING WORKBENCH) */}
+        {activeTab === "deconstruct" && (
+          <div className="-m-5 sm:-m-6 h-[calc(100%+2.5rem)]">
+            <StepComparator />
           </div>
         )}
       </div>

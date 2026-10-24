@@ -13,9 +13,14 @@ import {
   Clock,
   ArrowRight,
   Cpu,
+  Binary,
+  GitCompare,
+  Code as CodeIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { CodeEditor } from "@/components/workspace/CodeEditor";
+import { HexInspector } from "@/components/workspace/HexInspector";
+import { StepComparator } from "@/components/workspace/StepComparator";
 import { evaluateDsaSuite, type EvaluationResult, type DsaTestcase } from "@/lib/utils/testcaseEvaluator";
 
 export const LANGUAGE_BOILERPLATES: Record<string, string> = {
@@ -135,6 +140,7 @@ export function AttachedCompilerPanel({
   const [isAsmOpen, setIsAsmOpen] = useState<boolean>(false);
   const [asmOutput, setAsmOutput] = useState<string | null>(null);
   const [isDisassembling, setIsDisassembling] = useState<boolean>(false);
+  const [activeView, setActiveView] = useState<"editor" | "hex" | "steps">("editor");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInspectAsm = async () => {
@@ -272,6 +278,46 @@ export function AttachedCompilerPanel({
             <option value="python">Python 3.14</option>
             <option value="javascript">JavaScript (Node.js 24)</option>
           </select>
+
+          {/* View Mode Pill Switcher (Code | Hex | Steps) */}
+          <div className="hidden sm:flex items-center gap-0.5 bg-black/60 p-0.5 rounded-full border border-neutral-700">
+            <button
+              onClick={() => setActiveView("editor")}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono font-bold transition-all ${
+                activeView === "editor"
+                  ? "bg-white text-black shadow-xs font-black"
+                  : "text-neutral-400 hover:text-white"
+              }`}
+              title="Code Editor"
+            >
+              <CodeIcon className="w-3 h-3" />
+              <span>Code</span>
+            </button>
+            <button
+              onClick={() => setActiveView("hex")}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono font-bold transition-all ${
+                activeView === "hex"
+                  ? "bg-[#FAFF00] text-black shadow-xs font-black"
+                  : "text-neutral-400 hover:text-white"
+              }`}
+              title="Binary Hex & Format Overlay"
+            >
+              <Binary className="w-3 h-3" />
+              <span>Hex</span>
+            </button>
+            <button
+              onClick={() => setActiveView("steps")}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-mono font-bold transition-all ${
+                activeView === "steps"
+                  ? "bg-[#FAFF00] text-black shadow-xs font-black"
+                  : "text-neutral-400 hover:text-white"
+              }`}
+              title="Step-by-step Disassembly Deconstruction"
+            >
+              <GitCompare className="w-3 h-3" />
+              <span>Steps</span>
+            </button>
+          </div>
         </div>
 
         {/* Action Icons: Upload File & Reset */}
@@ -318,15 +364,19 @@ export function AttachedCompilerPanel({
         </div>
       </div>
 
-      {/* Code Editor Container */}
+      {/* Main View Container */}
       <div className="flex-1 min-h-[220px] overflow-hidden">
-        <CodeEditor
-          language={language}
-          value={code}
-          onChange={(val) => setCode(val)}
-          onRun={handleRun}
-          hideHeader={true}
-        />
+        {activeView === "editor" && (
+          <CodeEditor
+            language={language}
+            value={code}
+            onChange={(val) => setCode(val)}
+            onRun={handleRun}
+            hideHeader={true}
+          />
+        )}
+        {activeView === "hex" && <HexInspector />}
+        {activeView === "steps" && <StepComparator />}
       </div>
 
       {/* Binary / ASM Disassembly Drawer (REA Engine) */}
