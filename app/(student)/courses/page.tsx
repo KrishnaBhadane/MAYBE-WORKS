@@ -13,24 +13,28 @@ export const dynamic = "force-dynamic";
 export default async function CoursesPage() {
   const supabase = await getSupabaseServerClient();
 
-  const { data: courses } = await supabase
-    .from("courses")
-    .select("id, title, slug, icon, is_published, created_at")
-    .eq("is_published", true)
-    .order("created_at", { ascending: true });
+  // Run all database calls in PARALLEL to eliminate serial waterfall delay
+  const [coursesRes, tracksRes, authRes] = await Promise.all([
+    supabase
+      .from("courses")
+      .select("id, title, slug, icon, is_published, created_at")
+      .eq("is_published", true)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("course_tracks")
+      .select("*")
+      .order("daily_hours", { ascending: true }),
+    supabase.auth.getUser(),
+  ]);
 
-  const { data: tracks } = await supabase
-    .from("course_tracks")
-    .select("*")
-    .order("daily_hours", { ascending: true });
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const courses = coursesRes.data;
+  const tracks = tracksRes.data;
+  const user = authRes.data?.user;
 
   let enrolledTrackIds: string[] = [];
   let userEnrollments: { id: string; track_id: string; current_day: number; is_completed: boolean }[] = [];
   let activeEnrollmentCount = 0;
+
   if (user) {
     const { data: enrollments } = await supabase
       .from("enrollments")

@@ -12,6 +12,7 @@ import {
   XCircle,
   Clock,
   ArrowRight,
+  Cpu,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { CodeEditor } from "@/components/workspace/CodeEditor";
@@ -131,7 +132,32 @@ export function AttachedCompilerPanel({
   const [runOutput, setRunOutput] = useState<{ stdout: string; stderr: string; timeMs?: number } | null>(null);
   const [evalResult, setEvalResult] = useState<EvaluationResult | null>(null);
   const [showConsole, setShowConsole] = useState<boolean>(false);
+  const [isAsmOpen, setIsAsmOpen] = useState<boolean>(false);
+  const [asmOutput, setAsmOutput] = useState<string | null>(null);
+  const [isDisassembling, setIsDisassembling] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleInspectAsm = async () => {
+    if (isAsmOpen) {
+      setIsAsmOpen(false);
+      return;
+    }
+    setIsAsmOpen(true);
+    setIsDisassembling(true);
+    try {
+      const res = await fetch("/api/code/disassemble", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, language }),
+      });
+      const data = await res.json();
+      setAsmOutput(data.assembly || "// No assembly produced.");
+    } catch {
+      setAsmOutput("// Disassembly failed.");
+    } finally {
+      setIsDisassembling(false);
+    }
+  };
 
   const formattedTestcases: DsaTestcase[] = testcases.map((t) => ({
     input: t.input,
@@ -267,6 +293,20 @@ export function AttachedCompilerPanel({
             <span className="hidden sm:inline">Upload File</span>
           </button>
 
+          {/* Inspect ASM / Disassembly (REA Binary Integration) */}
+          <button
+            onClick={handleInspectAsm}
+            className={`flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold rounded-full transition-colors border ${
+              isAsmOpen
+                ? "bg-[#FAFF00] text-black border-[#FAFF00]"
+                : "bg-white/10 hover:bg-white/20 text-neutral-200 hover:text-white border-white/15"
+            }`}
+            title="Inspect Compiled x86/ARM Assembly (REA Decompiler)"
+          >
+            <Cpu className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Inspect ASM</span>
+          </button>
+
           {/* Reset Code */}
           <button
             onClick={handleReset}
@@ -288,6 +328,24 @@ export function AttachedCompilerPanel({
           hideHeader={true}
         />
       </div>
+
+      {/* Binary / ASM Disassembly Drawer (REA Engine) */}
+      {isAsmOpen && (
+        <div className="border-t border-neutral-800 bg-[#0A0E1A] p-3.5 max-h-56 overflow-y-auto font-mono text-xs select-text">
+          <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-neutral-800">
+            <span className="text-[#FAFF00] font-black uppercase text-[11px] tracking-wider flex items-center gap-1.5">
+              <Cpu className="w-3.5 h-3.5" />
+              Compiled Binary Disassembly (-O3)
+            </span>
+            <span className="text-[10px] text-neutral-400 font-mono">REA Binary Engine</span>
+          </div>
+          {isDisassembling ? (
+            <div className="text-neutral-400 py-3 text-center">Disassembling binary opcodes...</div>
+          ) : (
+            <pre className="text-emerald-400 whitespace-pre-wrap font-mono text-xs leading-relaxed">{asmOutput}</pre>
+          )}
+        </div>
+      )}
 
       {/* Collapsible "Test against Custom Input" (Matching CodeChef Image 1) */}
       <div className="border-t border-neutral-800 bg-[#141A29]">

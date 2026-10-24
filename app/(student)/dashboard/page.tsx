@@ -27,23 +27,22 @@ export default async function DashboardPage() {
     redirect("/login?redirectTo=/dashboard");
   }
 
-  // 1. Fetch Profile for Streak Tracking
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
+  // 1 & 2. Fetch Profile and User Enrollments in parallel
+  const [profileRes, enrollmentsRes] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single(),
+    supabase
+      .from("enrollments")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false }),
+  ]);
 
-  const userProfile = profile as Profile | null;
-
-  // 2. Fetch User Enrollments
-  const { data: enrollments } = await supabase
-    .from("enrollments")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
-
-  const enrollmentList = (enrollments as Enrollment[]) ?? [];
+  const userProfile = profileRes.data as Profile | null;
+  const enrollmentList = (enrollmentsRes.data as Enrollment[]) ?? [];
   const trackIds = enrollmentList.map((e) => e.track_id);
 
   // 3. Fetch Tracks

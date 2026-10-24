@@ -1,6 +1,35 @@
 import type { Metadata } from "next";
+import { Fustat, Open_Sans, Roboto_Mono, Creepster } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
+
+const fustat = Fustat({
+  subsets: ["latin"],
+  variable: "--font-fustat",
+  display: "swap",
+  weight: ["300", "400", "600", "700", "800"],
+});
+
+const openSans = Open_Sans({
+  subsets: ["latin"],
+  variable: "--font-open-sans",
+  display: "swap",
+  weight: ["400", "600", "700", "800"],
+});
+
+const robotoMono = Roboto_Mono({
+  subsets: ["latin"],
+  variable: "--font-roboto-mono",
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
+});
+
+const creepster = Creepster({
+  subsets: ["latin"],
+  variable: "--font-creepster",
+  display: "swap",
+  weight: ["400"],
+});
 
 export const metadata: Metadata = {
   title: "kreepycode — Practice Code. Daily.",
@@ -16,15 +45,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Fustat:wght@300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700;800&family=Roboto+Mono:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html
+      lang="en"
+      className={`h-full antialiased ${fustat.variable} ${openSans.variable} ${robotoMono.variable} ${creepster.variable}`}
+    >
       <body className="min-h-full flex flex-col bg-white text-black font-sans selection:bg-[#FAFF00] selection:text-black">
         <Header />
         <main className="flex-1 flex flex-col">{children}</main>

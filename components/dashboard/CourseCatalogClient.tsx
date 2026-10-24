@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Terminal, Database, ArrowRight, CheckCircle2, Play } from "lucide-react";
+import { Terminal, Database, ArrowRight, CheckCircle2, Play, Shield } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { HourSelectorModal } from "@/components/dashboard/HourSelectorModal";
 import type { Course, CourseTrack } from "@/lib/supabase/types";
@@ -152,6 +152,8 @@ export function CourseCatalogClient({
                     <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black text-[#FAFF00] flex items-center justify-center border-2 border-black rounded-xl shrink-0 shadow-xs">
                       {course.slug.includes("sql") ? (
                         <Database className="w-5 h-5 sm:w-6 sm:h-6" />
+                      ) : course.slug.includes("reverse") ? (
+                        <Shield className="w-5 h-5 sm:w-6 sm:h-6" />
                       ) : (
                         <Terminal className="w-5 h-5 sm:w-6 sm:h-6" />
                       )}
@@ -254,10 +256,12 @@ export function CourseCatalogClient({
                     {/* Course Icon & Category */}
                     <div className="flex items-center justify-between mb-2.5 sm:mb-4">
                       <div className="w-7 h-7 sm:w-10 sm:h-10 bg-black text-[#FAFF00] flex items-center justify-center border border-black rounded-md sm:rounded-lg shrink-0">
-                        {course.slug === "dsa-cpp" ? (
-                          <Terminal className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
-                        ) : (
+                        {course.slug.includes("sql") ? (
                           <Database className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+                        ) : course.slug.includes("reverse") ? (
+                          <Shield className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+                        ) : (
+                          <Terminal className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                         )}
                       </div>
                     </div>

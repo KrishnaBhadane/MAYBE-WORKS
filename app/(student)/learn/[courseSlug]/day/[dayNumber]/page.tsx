@@ -73,14 +73,21 @@ export default async function DayPage({ params }: PageProps) {
     notFound();
   }
 
-  // 4. Fetch Tasks and Task Completions
-  const { data: tasks } = await supabase
-    .from("day_tasks")
-    .select("*")
-    .eq("day_id", trackDay.id)
-    .order("sequence_order", { ascending: true });
+  // 4. Fetch Tasks and Profile in parallel
+  const [tasksRes, profileRes] = await Promise.all([
+    supabase
+      .from("day_tasks")
+      .select("*")
+      .eq("day_id", trackDay.id)
+      .order("sequence_order", { ascending: true }),
+    supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single(),
+  ]);
 
-  const taskList = (tasks as DayTask[]) ?? [];
+  const taskList = (tasksRes.data as DayTask[]) ?? [];
   const taskIds = taskList.map((t) => t.id);
 
   const { data: completions } = taskIds.length > 0
@@ -92,12 +99,7 @@ export default async function DayPage({ params }: PageProps) {
     : { data: [] };
 
   const completedTaskIds = completions?.map((c) => c.task_id) ?? [];
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
+  const profile = profileRes.data;
 
   return (
     <DayWorkspaceClient
