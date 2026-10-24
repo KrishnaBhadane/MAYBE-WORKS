@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ShieldCheck, BarChart3, BookOpen, PlusCircle, Users, ArrowRight } from "lucide-react";
+import { ShieldCheck, BarChart3, BookOpen, PlusCircle, Users, ArrowRight, Trophy } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 
 interface AdminHeaderProps {
@@ -11,6 +11,7 @@ interface AdminHeaderProps {
 
 const adminTabs = [
   { href: "/admin", label: "Overview", icon: BarChart3, exact: true },
+  { href: "/admin/contests", label: "Contests & Proctoring", icon: Trophy, exact: false },
   { href: "/admin/courses", label: "Courses & Tracks", icon: BookOpen, exact: false },
   { href: "/admin/tasks", label: "Task Builder", icon: PlusCircle, exact: false },
   { href: "/admin/users", label: "Student Roster", icon: Users, exact: false },
@@ -55,6 +56,7 @@ export function AdminHeader({ userEmail }: AdminHeaderProps) {
             <Link
               key={tab.href}
               href={tab.href}
+              prefetch={true}
               className={`flex items-center gap-2 px-4 py-2.5 text-xs font-mono font-bold border-b-2 transition-colors whitespace-nowrap ${
                 isActive
                   ? "border-black text-black bg-[#F8F9FA]"

@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   User,
   Shield,
+  Trophy,
 } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
@@ -242,9 +243,20 @@ export function WorkspaceTopBar({
         {/* Divider */}
         <div className="h-4 w-px bg-white/20 mx-1 hidden sm:block" />
 
+        {/* Contests Button */}
+        <Link href="/contests" prefetch={true}>
+          <button
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-bold border border-white/20 hover:border-[#FAFF00] hover:text-[#FAFF00] text-white hover:bg-white/10 transition-colors"
+            title="Open Proctored Contests"
+          >
+            <Trophy className="w-3 h-3 text-[#FAFF00]" />
+            <span className="hidden sm:inline">Contest</span>
+          </button>
+        </Link>
+
         {/* Admin Button if Admin */}
         {isAdmin && (
-          <Link href="/admin">
+          <Link href="/admin" prefetch={true}>
             <Button
               variant="yellow"
               size="sm"

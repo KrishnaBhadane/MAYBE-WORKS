@@ -120,7 +120,29 @@ export default async function AdminOverviewPage() {
       {/* Quick Action Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Link
+          href="/admin/contests"
+          prefetch={true}
+          className="border-2 border-black bg-[#FAFF00]/15 p-6 hover:shadow-md transition-shadow group flex items-center justify-between md:col-span-2"
+        >
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="px-2 py-0.5 rounded bg-black text-[#FAFF00] font-mono text-[10px] font-black uppercase">
+                REA Proctoring
+              </span>
+              <h3 className="text-base font-black text-black uppercase tracking-tight group-hover:underline">
+                CodeChef-Style Contests & Real-Time Proctoring
+              </h3>
+            </div>
+            <p className="text-xs text-neutral-600 font-sans">
+              Generate invite codes, monitor tab-switch penalties in real time, view live scoreboard, and kick participants.
+            </p>
+          </div>
+          <ArrowRight className="w-5 h-5 text-black group-hover:translate-x-1 transition-transform" />
+        </Link>
+
+        <Link
           href="/admin/courses"
+          prefetch={true}
           className="border-2 border-black bg-white p-6 hover:shadow-md transition-shadow group flex items-center justify-between"
         >
           <div>
@@ -136,6 +158,7 @@ export default async function AdminOverviewPage() {
 
         <Link
           href="/admin/users"
+          prefetch={true}
           className="border-2 border-black bg-white p-6 hover:shadow-md transition-shadow group flex items-center justify-between"
         >
           <div>
