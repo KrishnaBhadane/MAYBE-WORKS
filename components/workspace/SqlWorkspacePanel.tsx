@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Play, Send, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { CodeEditor } from "@/components/workspace/CodeEditor";
 import { SqlRunner } from "@/components/workspace/SqlRunner";
+import { SqlSchemaInspector } from "@/components/workspace/SqlSchemaInspector";
 import { getSqlEngine, type SqlQueryResult } from "@/lib/services/sqlWorker";
 import { evaluateSqlRows, type SqlRow } from "@/lib/utils/testcaseEvaluator";
 
@@ -48,7 +49,7 @@ export function SqlWorkspacePanel({
     };
   }, [schemaSql]);
 
-  const handleExecute = async () => {
+  const handleExecute = useCallback(async () => {
     setIsRunning(true);
     setErrorMsg(undefined);
     try {
@@ -65,9 +66,9 @@ export function SqlWorkspacePanel({
     } finally {
       setIsRunning(false);
     }
-  };
+  }, [query, expectedOutput]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (!isMatch) return;
     setIsSubmitting(true);
     try {
@@ -75,10 +76,32 @@ export function SqlWorkspacePanel({
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [isMatch, query, onSubmitSuccess]);
+
+  // Global IDE Keyboard Shortcuts for SQL (Cmd+Enter to run, Cmd+Shift+Enter to submit)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        e.preventDefault();
+        if (e.shiftKey) {
+          handleSubmit();
+        } else {
+          handleExecute();
+        }
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleExecute, handleSubmit]);
 
   return (
     <div className="flex flex-col h-full bg-[#1E1E1E]">
+      {/* Interactive SQL Table Schema Inspector (HackerRank Ribbon) */}
+      <SqlSchemaInspector
+        schemaSql={schemaSql}
+        onInsertColumn={(col) => setQuery((prev) => prev + (prev.endsWith(" ") || prev === "" ? "" : " ") + col)}
+      />
+
       {/* SQL Editor */}
       <div className="flex-1 min-h-[250px]">
         <CodeEditor
@@ -103,18 +126,19 @@ export function SqlWorkspacePanel({
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleExecute} disabled={isRunning || !isDbReady}>
+          <Button variant="outline" size="sm" onClick={handleExecute} disabled={isRunning || !isDbReady} title="Execute Query (⌘ + Enter)">
             <Play className="w-3.5 h-3.5 mr-1" />
-            {isRunning ? "Running..." : "Run Query"}
+            {isRunning ? "Running..." : "Run Query (⌘↵)"}
           </Button>
           <Button
             variant="yellow"
             size="sm"
             onClick={handleSubmit}
             disabled={!isMatch || isSubmitting || isCompleted}
+            title="Submit Verified Query (⇧ + ⌘ + Enter)"
           >
             <Send className="w-3.5 h-3.5 mr-1 text-black" />
-            {isSubmitting ? "Submitting..." : isCompleted ? "Completed" : "Submit Query"}
+            {isSubmitting ? "Submitting..." : isCompleted ? "Completed" : "Submit Query (⇧⌘↵)"}
           </Button>
         </div>
       </div>
