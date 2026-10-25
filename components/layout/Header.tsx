@@ -20,7 +20,7 @@ interface HeaderProps {
 export function Header({ user = null }: HeaderProps) {
   const pathname = usePathname();
   const isHome = pathname === "/";
-  const isWorkspace = /^\/learn\/[^/]+\/day\//.test(pathname);
+  const isWorkspace = /^\/learn\/[^/]+\/day\//.test(pathname) || /^\/contests\/[^/]+/.test(pathname);
 
   const [currentUser, setCurrentUser] = useState<{ email: string; role?: string } | null>(
     user ? { email: user.email, role: user.role } : null

@@ -11,7 +11,7 @@ export async function POST(request: Request, { params }: Params) {
   try {
     const { contestId } = await params;
     const body = await request.json();
-    const { userEmail, questionId, points } = body;
+    const { userEmail, questionId, points, selectedOptionIdx } = body;
 
     if (!userEmail || !questionId) {
       return NextResponse.json({ error: "Missing submission params" }, { status: 400 });
@@ -21,7 +21,8 @@ export async function POST(request: Request, { params }: Params) {
       contestId,
       userEmail,
       questionId,
-      Number(points) || 0
+      Number(points) || 0,
+      typeof selectedOptionIdx === "number" ? selectedOptionIdx : undefined
     );
 
     if (!participant) {

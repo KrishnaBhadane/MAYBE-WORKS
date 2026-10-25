@@ -54,6 +54,8 @@ export interface ContestParticipant {
   userEmail: string;
   userName: string;
   joinedAt: string;
+  startTimestampMs: number;
+  endTimestampMs: number;
   status: "active" | "flagged" | "kicked" | "submitted";
   score: number;
   penalties: number;
@@ -65,6 +67,7 @@ export interface ContestParticipant {
   answeredQuestions: Record<string, {
     solved: boolean;
     points: number;
+    selectedOptionIdx?: number;
     submittedAt?: string;
   }>;
 }
@@ -169,13 +172,16 @@ INSERT INTO transactions VALUES (5, 103, 50.00, 'cleared');`,
     };
 
     this.contests.set(starterContest.id, starterContest);
+    const now = Date.now();
     this.participants.set(starterContest.id, [
       {
         id: "p-mock-1",
         contestId: starterContest.id,
         userEmail: "alex.chen@kernel.org",
         userName: "Alex Chen",
-        joinedAt: new Date(Date.now() - 15 * 60000).toISOString(),
+        joinedAt: new Date(now - 15 * 60000).toISOString(),
+        startTimestampMs: now - 15 * 60000,
+        endTimestampMs: now + 30 * 60000,
         status: "active",
         score: 75,
         penalties: 0,
@@ -194,7 +200,9 @@ INSERT INTO transactions VALUES (5, 103, 50.00, 'cleared');`,
         contestId: starterContest.id,
         userEmail: "samantha.dev@mit.edu",
         userName: "Samantha Miller",
-        joinedAt: new Date(Date.now() - 20 * 60000).toISOString(),
+        joinedAt: new Date(now - 20 * 60000).toISOString(),
+        startTimestampMs: now - 20 * 60000,
+        endTimestampMs: now + 25 * 60000,
         status: "flagged",
         score: 50,
         penalties: 10,
@@ -237,7 +245,15 @@ INSERT INTO transactions VALUES (5, 103, 50.00, 'cleared');`,
 
   // Participants
   public getParticipants(contestId: string): ContestParticipant[] {
-    return this.participants.get(contestId) || [];
+    const list = this.participants.get(contestId) || [];
+    const now = Date.now();
+    // Auto-expire participants whose timers ended
+    list.forEach((p) => {
+      if (p.status !== "kicked" && p.status !== "submitted" && p.endTimestampMs && now >= p.endTimestampMs) {
+        p.status = "submitted";
+      }
+    });
+    return list;
   }
 
   public joinContest(
@@ -247,14 +263,22 @@ INSERT INTO transactions VALUES (5, 103, 50.00, 'cleared');`,
   ): ContestParticipant {
     const list = this.participants.get(contestId) || [];
     let existing = list.find((p) => p.userEmail.toLowerCase() === userEmail.toLowerCase());
+    const now = Date.now();
 
     if (!existing) {
+      const contest = this.contests.get(contestId);
+      const durationMs = (contest ? contest.durationMinutes : 60) * 60 * 1000;
+      const startMs = now;
+      const endMs = startMs + durationMs;
+
       existing = {
         id: `p-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
         contestId,
         userEmail,
         userName: userName || userEmail.split("@")[0],
         joinedAt: new Date().toISOString(),
+        startTimestampMs: startMs,
+        endTimestampMs: endMs,
         status: "active",
         score: 0,
         penalties: 0,
@@ -267,6 +291,11 @@ INSERT INTO transactions VALUES (5, 103, 50.00, 'cleared');`,
       };
       list.push(existing);
       this.participants.set(contestId, list);
+    } else {
+      // Check if time expired while away
+      if (existing.endTimestampMs && now >= existing.endTimestampMs && existing.status !== "kicked") {
+        existing.status = "submitted";
+      }
     }
     return existing;
   }
@@ -283,6 +312,17 @@ INSERT INTO transactions VALUES (5, 103, 50.00, 'cleared');`,
     return false;
   }
 
+  public finishContest(contestId: string, userEmail: string): ContestParticipant | null {
+    const list = this.participants.get(contestId) || [];
+    const target = list.find((p) => p.userEmail.toLowerCase() === userEmail.toLowerCase());
+    if (target) {
+      target.status = "submitted";
+      target.lastActiveAt = new Date().toISOString();
+      return target;
+    }
+    return null;
+  }
+
   public recordViolation(
     contestId: string,
     userEmail: string,
@@ -290,7 +330,22 @@ INSERT INTO transactions VALUES (5, 103, 50.00, 'cleared');`,
     durationSeconds = 0
   ): { participant: ContestParticipant | null; event: ContestViolationEvent } {
     const contest = this.contests.get(contestId);
-    const penaltyAmount = contest ? contest.tabSwitchPenalty : 5;
+    const basePenalty = contest ? contest.tabSwitchPenalty : 5;
+
+    // Rule: Copying does NOT deduct points! Pasting and Tab Switches DO deduct points!
+    const isCopy = violationType === "clipboard_copy";
+    const penaltyAmount = isCopy ? 0 : basePenalty;
+
+    let detailsMsg = "";
+    if (violationType === "tab_switch") {
+      detailsMsg = `Tab switched away for ${durationSeconds.toFixed(1)}s (-${penaltyAmount} pts)`;
+    } else if (violationType === "clipboard_copy") {
+      detailsMsg = `Clipboard copy performed (No penalty applied)`;
+    } else if (violationType === "clipboard_paste") {
+      detailsMsg = `Unauthorized paste blocked (-${penaltyAmount} pts)`;
+    } else {
+      detailsMsg = `DevTools inspection attempt (-${penaltyAmount} pts)`;
+    }
 
     const event: ContestViolationEvent = {
       id: `v-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
@@ -300,9 +355,7 @@ INSERT INTO transactions VALUES (5, 103, 50.00, 'cleared');`,
       type: violationType,
       durationSeconds,
       penaltyApplied: penaltyAmount,
-      details: violationType === "tab_switch"
-        ? `Tab switched away for ${durationSeconds.toFixed(1)}s (-${penaltyAmount} pts)`
-        : `Unauthorized clipboard action blocked (-${penaltyAmount} pts)`
+      details: detailsMsg,
     };
 
     const violationsList = this.violations.get(contestId) || [];
@@ -312,7 +365,7 @@ INSERT INTO transactions VALUES (5, 103, 50.00, 'cleared');`,
     const list = this.participants.get(contestId) || [];
     const participant = list.find((p) => p.userEmail.toLowerCase() === userEmail.toLowerCase());
 
-    if (participant && participant.status !== "kicked") {
+    if (participant && participant.status !== "kicked" && participant.status !== "submitted") {
       if (violationType === "tab_switch") {
         participant.tabSwitches += 1;
         participant.totalTimeAwaySeconds += durationSeconds;
@@ -333,16 +386,24 @@ INSERT INTO transactions VALUES (5, 103, 50.00, 'cleared');`,
     contestId: string,
     userEmail: string,
     questionId: string,
-    pointsAwarded: number
+    pointsAwarded: number,
+    selectedOptionIdx?: number
   ): ContestParticipant | null {
     const list = this.participants.get(contestId) || [];
     const participant = list.find((p) => p.userEmail.toLowerCase() === userEmail.toLowerCase());
-    if (!participant || participant.status === "kicked") return null;
+    if (!participant || participant.status === "kicked" || participant.status === "submitted") return null;
+
+    // Check if time expired
+    if (participant.endTimestampMs && Date.now() >= participant.endTimestampMs) {
+      participant.status = "submitted";
+      return participant;
+    }
 
     if (!participant.answeredQuestions[questionId]?.solved) {
       participant.answeredQuestions[questionId] = {
         solved: true,
         points: pointsAwarded,
+        selectedOptionIdx,
         submittedAt: new Date().toISOString(),
       };
       participant.score += pointsAwarded;

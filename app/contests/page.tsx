@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Header } from "@/components/layout/Header";
 import { Trophy, ShieldAlert, Clock, ArrowRight, Lock, KeyRound, Sparkles, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
@@ -58,8 +57,6 @@ export default function ContestsPortalPage() {
 
   return (
     <div className="min-h-screen bg-black text-white selection:bg-[#FAFF00] selection:text-black">
-      <Header />
-
       <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-12 pb-24">
         {/* Top Banner */}
         <div className="text-center max-w-2xl mx-auto mb-12 space-y-4">
