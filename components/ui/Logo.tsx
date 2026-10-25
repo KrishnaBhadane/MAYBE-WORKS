@@ -25,23 +25,25 @@ export const Logo: React.FC<LogoProps> = ({
 
   const content = (
     <div className={`inline-flex items-center gap-3 select-none ${className}`}>
-      {/* Round circular SVG / container for the kreepycode mark */}
+      {/* Round circular container for the high quality kreepycode mark */}
       <div
-        className="relative overflow-hidden rounded-full border border-black bg-white shadow-xs shrink-0 flex items-center justify-center"
+        className="relative overflow-hidden rounded-full border-2 border-white/30 bg-white shadow-sm shrink-0 flex items-center justify-center transition-transform hover:scale-105"
         style={{ width: dimension, height: dimension }}
       >
         <Image
-          src="/brand/kreepycode-logo.png"
+          src="/brand/kreepycode-mark.png"
           alt="kreepycode logo"
-          width={dimension}
-          height={dimension}
+          width={dimension * 2}
+          height={dimension * 2}
           priority
-          className="h-full w-full object-cover rounded-full"
+          quality={100}
+          unoptimized
+          className="h-full w-full object-contain p-0.5"
         />
       </div>
 
       {variant === "full" && (
-        <span className={`font-black uppercase text-black font-sans ${textClass}`}>
+        <span className={`font-black uppercase text-white font-sans ${textClass}`}>
           KREEPYCODE
         </span>
       )}

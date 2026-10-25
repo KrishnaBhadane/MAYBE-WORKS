@@ -54,6 +54,7 @@ export interface AntiMetalButtonProps
   accentFrom?: string;
   accentTo?: string;
   dotColor?: string;
+  size?: "sm" | "md" | "lg";
 }
 
 export const AntiMetalButton = React.forwardRef<
@@ -65,6 +66,7 @@ export const AntiMetalButton = React.forwardRef<
       className,
       children,
       label,
+      size = "md",
       // Official kreepycode brand palette defaults: Lemon Yellow (#FAFF00) & Deep Navy (#0A1128)
       accentFrom = "#FAFF00",
       accentTo = "#EEF200",
@@ -75,13 +77,20 @@ export const AntiMetalButton = React.forwardRef<
   ) => {
     const content = label ?? children ?? "Explore Tracks";
 
+    const sizeClasses = {
+      sm: "h-9 sm:h-10 min-w-[110px] sm:min-w-[124px] px-3.5 text-xs",
+      md: "h-12 min-w-[160px] sm:min-w-[180px] px-6 text-sm",
+      lg: "h-14 min-w-[190px] sm:min-w-[210px] px-8 text-base",
+    }[size];
+
     return (
       <button
         ref={ref}
         className={cn(
-          "group/btn relative inline-flex h-12 min-w-[160px] sm:min-w-[180px] px-6 items-center justify-center overflow-hidden rounded-sm transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAFF00] focus-visible:ring-offset-2 focus-visible:ring-offset-black cursor-pointer select-none",
+          "group/btn relative inline-flex items-center justify-center overflow-hidden rounded-full sm:rounded-md transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAFF00] focus-visible:ring-offset-2 focus-visible:ring-offset-black cursor-pointer select-none",
           "border border-white/20 bg-[linear-gradient(180deg,#0A1128_0%,#050814_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_4px_16px_rgba(0,0,0,0.4)]",
           "hover:border-[#FAFF00]/50",
+          sizeClasses,
           className
         )}
         {...props}

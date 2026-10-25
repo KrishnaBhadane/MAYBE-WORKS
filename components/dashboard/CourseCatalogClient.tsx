@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Terminal, Database, ArrowRight, CheckCircle2, Play, Shield } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Terminal, Database, CheckCircle2, Shield } from "lucide-react";
+import { AntiMetalButton } from "@/components/ui/anti-metal-button";
 import { HourSelectorModal } from "@/components/dashboard/HourSelectorModal";
 import type { Course, CourseTrack } from "@/lib/supabase/types";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -129,11 +129,11 @@ export function CourseCatalogClient({
       {/* 1. Enrolled Courses Section (Above Courses) */}
       {enrolledItems.length > 0 && (
         <div className="mb-10 sm:mb-14">
-          <div className="border-b-2 border-black pb-4 sm:pb-6 mb-6 sm:mb-8 flex items-center justify-between">
-            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-black tracking-tight uppercase">
+          <div className="border-b border-white/20 pb-4 sm:pb-6 mb-6 sm:mb-8 flex items-center justify-between">
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight uppercase drop-shadow-md">
               Enrolled Courses
             </h2>
-            <span className="text-xs font-mono font-bold uppercase tracking-wider px-3 py-1 bg-black text-[#FAFF00] rounded-full">
+            <span className="text-xs font-mono font-black uppercase tracking-wider px-3.5 py-1 bg-[#FAFF00] text-black rounded-full shadow-sm">
               {enrolledItems.length} Enrolled
             </span>
           </div>
@@ -145,11 +145,11 @@ export function CourseCatalogClient({
               return (
                 <div
                   key={enrollment.id || course.id}
-                  className="border-2 border-black bg-white rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:shadow-md transition-all duration-200"
+                  className="border border-white/20 bg-black/80 backdrop-blur-md rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-[#FAFF00]/50 transition-all duration-200 shadow-xl"
                 >
                   {/* The Course Name */}
                   <div className="flex-1 min-w-0 flex items-center gap-3 sm:gap-4">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-black text-[#FAFF00] flex items-center justify-center border-2 border-black rounded-xl shrink-0 shadow-xs">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 text-[#FAFF00] flex items-center justify-center border border-white/20 rounded-xl shrink-0 shadow-xs">
                       {course.slug.includes("sql") ? (
                         <Database className="w-5 h-5 sm:w-6 sm:h-6" />
                       ) : course.slug.includes("reverse") ? (
@@ -159,10 +159,10 @@ export function CourseCatalogClient({
                       )}
                     </div>
                     <div className="min-w-0">
-                      <h3 className="text-base sm:text-lg lg:text-xl font-black text-black tracking-tight truncate">
+                      <h3 className="text-base sm:text-lg lg:text-xl font-black text-white tracking-tight truncate">
                         {course.title}
                       </h3>
-                      <span className="text-[11px] font-mono text-neutral-500 font-bold uppercase tracking-wider">
+                      <span className="text-[11px] font-mono text-neutral-400 font-bold uppercase tracking-wider">
                         Enrolled Curriculum
                       </span>
                     </div>
@@ -171,45 +171,46 @@ export function CourseCatalogClient({
                   {/* The hour he enrolled for and Day going on in vertical order */}
                   <div className="shrink-0 flex flex-col items-start sm:items-center gap-1.5 sm:px-6 sm:min-w-[150px]">
                     {/* The hour he enrolled for */}
-                    <span className="inline-flex items-center px-3.5 py-1 rounded-full bg-[#FAFF00] border-2 border-black text-xs font-mono font-black text-black shadow-xs whitespace-nowrap">
+                    <span className="inline-flex items-center px-3.5 py-1 rounded-full bg-[#FAFF00] border border-black text-xs font-mono font-black text-black shadow-xs whitespace-nowrap">
                       {track.daily_hours}H / Day Track
                     </span>
 
                     {/* Day going on */}
                     {isFinished ? (
-                      <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-black text-[#FAFF00] border-2 border-black text-xs font-mono font-black shadow-xs whitespace-nowrap">
+                      <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/10 text-[#FAFF00] border border-white/20 text-xs font-mono font-black shadow-xs whitespace-nowrap">
                         <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" />
                         Completed
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-neutral-100 text-black border-2 border-black/20 text-xs font-mono font-bold whitespace-nowrap">
+                      <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/10 text-white border border-white/20 text-xs font-mono font-bold whitespace-nowrap">
                         Day {enrollment.current_day} of {track.total_days}
                       </span>
                     )}
                   </div>
 
-                  {/* Resume / Completed Button - fixed at right with uniform width */}
-                  <div className="shrink-0 flex items-center justify-end sm:min-w-[130px]">
+                  {/* Resume / Completed Button using AntiMetalButton matching Hero */}
+                  <div className="shrink-0 flex items-center justify-end sm:min-w-[140px]">
                     {isFinished ? (
                       <Link href={`/learn/${course.slug}/roadmap`} className="w-full sm:w-auto">
-                        <Button
-                          variant="outline"
+                        <AntiMetalButton
+                          label="Completed"
                           size="sm"
-                          className="w-full sm:w-[124px] rounded-full font-black text-xs uppercase py-2 border-2 border-black hover:bg-black hover:text-[#FAFF00] justify-center"
-                        >
-                          Completed
-                        </Button>
+                          accentFrom="#FFFFFF"
+                          accentTo="#E5E7EB"
+                          dotColor="#000000"
+                          className="w-full sm:w-auto"
+                        />
                       </Link>
                     ) : (
                       <Link href={`/learn/${course.slug}/day/${enrollment.current_day}`} className="w-full sm:w-auto">
-                        <Button
-                          variant="yellow"
+                        <AntiMetalButton
+                          label="Resume"
                           size="sm"
-                          className="w-full sm:w-[124px] rounded-full font-black text-xs uppercase py-2 shadow-sm flex items-center justify-center gap-1.5"
-                        >
-                          <Play className="w-3.5 h-3.5 fill-black" />
-                          Resume
-                        </Button>
+                          accentFrom="#FAFF00"
+                          accentTo="#EEF200"
+                          dotColor="#000000"
+                          className="w-full sm:w-auto"
+                        />
                       </Link>
                     )}
                   </div>
@@ -222,89 +223,88 @@ export function CourseCatalogClient({
 
       {/* 2. Course Section (Available Un-enrolled Courses) */}
       <div>
-        <div className="border-b-2 border-black pb-4 sm:pb-6 mb-6 sm:mb-8 flex items-center justify-between">
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-black tracking-tight uppercase">
+        <div className="border-b border-white/20 pb-4 sm:pb-6 mb-6 sm:mb-8 flex items-center justify-between">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight uppercase drop-shadow-md">
             Course
           </h1>
           {availableCourses.length > 0 && (
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-neutral-500">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-neutral-400">
               {availableCourses.length} Available
             </span>
           )}
         </div>
 
         {availableCourses.length === 0 ? (
-          <div className="p-8 sm:p-12 border-2 border-dashed border-black/30 rounded-2xl text-center bg-neutral-50">
-            <h3 className="text-lg font-black text-black uppercase">
+          <div className="p-8 sm:p-12 border border-dashed border-white/20 rounded-2xl text-center bg-black/60 backdrop-blur-md">
+            <h3 className="text-lg font-black text-white uppercase">
               All Courses Enrolled
             </h3>
-            <p className="text-xs text-neutral-600 mt-1 font-mono">
+            <p className="text-xs text-neutral-400 mt-1 font-mono">
               You are currently enrolled in all available courses in our catalog.
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
             {availableCourses.map((course) => {
               const courseTracks = tracks.filter((t) => t.course_id === course.id);
 
               return (
                 <div
                   key={course.id}
-                  className="border-2 border-black bg-white flex flex-col justify-between hover:shadow-lg transition-all duration-200 rounded-lg sm:rounded-xl overflow-hidden min-w-0"
+                  className="border border-white/20 bg-black/80 backdrop-blur-md flex flex-col justify-between hover:border-[#FAFF00]/50 transition-all duration-200 rounded-2xl overflow-hidden shadow-2xl min-w-0"
                 >
-                  <div className="p-2.5 sm:p-5 lg:p-6 flex-1 flex flex-col">
+                  <div className="p-4 sm:p-6 flex-1 flex flex-col">
                     {/* Course Icon & Category */}
-                    <div className="flex items-center justify-between mb-2.5 sm:mb-4">
-                      <div className="w-7 h-7 sm:w-10 sm:h-10 bg-black text-[#FAFF00] flex items-center justify-center border border-black rounded-md sm:rounded-lg shrink-0">
+                    <div className="flex items-center justify-between mb-3 sm:mb-4">
+                      <div className="w-9 h-9 sm:w-11 sm:h-11 bg-white/10 text-[#FAFF00] flex items-center justify-center border border-white/20 rounded-xl shrink-0">
                         {course.slug.includes("sql") ? (
-                          <Database className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+                          <Database className="w-4 h-4 sm:w-5 sm:h-5" />
                         ) : course.slug.includes("reverse") ? (
-                          <Shield className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+                          <Shield className="w-4 h-4 sm:w-5 sm:h-5" />
                         ) : (
-                          <Terminal className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+                          <Terminal className="w-4 h-4 sm:w-5 sm:h-5" />
                         )}
                       </div>
                     </div>
 
                     {/* Course Title Only */}
-                    <h2 className="text-xs sm:text-lg lg:text-xl font-black text-black tracking-tight leading-snug line-clamp-2 sm:line-clamp-none min-h-[2.2rem] sm:min-h-0">
+                    <h2 className="text-base sm:text-xl font-black text-white tracking-tight leading-snug line-clamp-2 min-h-[2.5rem]">
                       {course.title}
                     </h2>
 
                     {/* Available Pacing Tracks */}
-                    <div className="mt-3 sm:mt-5 pt-3 sm:pt-4 border-t border-black/15">
-                      <div className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-black mb-1.5 sm:mb-2">
-                        <span className="hidden sm:inline">Available </span>Pacing
+                    <div className="mt-4 pt-4 border-t border-white/15">
+                      <div className="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider text-neutral-400 mb-2">
+                        Available Pacing
                       </div>
-                      <div className="flex flex-wrap gap-1 sm:gap-1.5">
+                      <div className="flex flex-wrap gap-1.5">
                         {courseTracks.map((t) => (
                           <span
                             key={t.id}
-                            className="px-1.5 sm:px-2.5 py-0.5 sm:py-1 text-[9px] sm:text-xs font-mono font-black bg-[#F8F9FA] border border-black text-black rounded-sm sm:rounded-md whitespace-nowrap"
+                            className="px-2.5 py-1 text-[11px] font-mono font-bold bg-white/10 border border-white/20 text-neutral-200 rounded-md whitespace-nowrap"
                           >
                             {t.daily_hours}H
-                            <span className="hidden sm:inline"> / Day ({t.total_days}d)</span>
+                            <span> / Day ({t.total_days}d)</span>
                           </span>
                         ))}
                       </div>
                     </div>
                   </div>
 
-                  {/* Action Footer */}
-                  <div className="p-2 sm:p-4 bg-[#F8F9FA] border-t-2 border-black flex flex-col sm:flex-row items-center justify-between gap-1.5 sm:gap-2">
-                    <span className="hidden sm:inline text-xs font-mono text-black font-black uppercase tracking-wide">
+                  {/* Action Footer: Enroll button styled identical to Hero using AntiMetalButton */}
+                  <div className="p-3 sm:p-4 bg-black/60 border-t border-white/15 flex items-center justify-between gap-2">
+                    <span className="text-xs font-mono text-neutral-400 font-bold uppercase tracking-wide hidden sm:inline">
                       Daily Pacing
                     </span>
-                    <Button
-                      variant="yellow"
+                    <AntiMetalButton
+                      label="Enroll"
                       size="sm"
-                      className="w-full sm:w-auto text-[10px] sm:text-xs py-1.5 sm:py-2 px-2 sm:px-3 rounded-md sm:rounded-lg font-bold"
+                      accentFrom="#FAFF00"
+                      accentTo="#EEF200"
+                      dotColor="#000000"
                       onClick={() => handleOpenEnroll(course)}
-                    >
-                      <span className="hidden sm:inline">Select Pacing</span>
-                      <span className="sm:hidden">Enroll</span>
-                      <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 ml-1" />
-                    </Button>
+                      className="w-full sm:w-auto"
+                    />
                   </div>
                 </div>
               );

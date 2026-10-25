@@ -35,7 +35,13 @@ export const metadata: Metadata = {
   title: "kreepycode — Practice Code. Daily.",
   description: "High-performance coding platform with structured daily pacing for DSA, SQL, and Backend engineering.",
   icons: {
-    icon: "/icon.svg",
+    icon: [
+      { url: "/icon.png", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/brand/kreepycode-mark.png", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: "/apple-icon.png",
   },
 };
 
@@ -49,7 +55,7 @@ export default function RootLayout({
       lang="en"
       className={`h-full antialiased ${fustat.variable} ${openSans.variable} ${robotoMono.variable} ${creepster.variable}`}
     >
-      <body className="min-h-full flex flex-col bg-white text-black font-sans selection:bg-[#FAFF00] selection:text-black">
+      <body className="min-h-full flex flex-col bg-black text-white font-sans selection:bg-[#00FF66] selection:text-black">
         <Header />
         <main className="flex-1 flex flex-col">{children}</main>
       </body>

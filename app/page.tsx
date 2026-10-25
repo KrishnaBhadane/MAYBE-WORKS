@@ -1,6 +1,7 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import { HeroWithMatrix } from "@/components/home/HeroWithMatrix";
 import { CourseCatalogClient } from "@/components/dashboard/CourseCatalogClient";
+import { MatrixRain } from "@/components/ui/matrix-rain";
 import type { Course, CourseTrack } from "@/lib/supabase/types";
 import Link from "next/link";
 
@@ -59,44 +60,64 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="flex flex-col flex-1 bg-white text-black">
-      {/* Hero with Full Background MatrixRain & Creepycode Word-by-Word Animation */}
-      <HeroWithMatrix
-        initialUser={user ? { id: user.id, email: user.email ?? "" } : null}
-        hasEnrollment={enrolledTrackIds.length > 0}
-        activeCourseSlug={activeCourseSlug}
-        activeDayNumber={activeDayNumber}
-        isCourseCompleted={isCourseCompleted}
-      />
-
-      {/* Tracks Section Directly Under Hero */}
-      <section id="tracks" className="border-b-2 border-black bg-white">
-        <CourseCatalogClient
-          courses={(courses as Course[]) ?? []}
-          tracks={(tracks as CourseTrack[]) ?? []}
-          enrolledTrackIds={enrolledTrackIds}
-          userEnrollments={userEnrollments}
-          activeEnrollmentCount={activeEnrollmentCount}
-          userEmail={user?.email}
+    <div className="relative min-h-screen w-full bg-black text-white selection:bg-[#00FF66] selection:text-black">
+      {/* FIXED GREEN CODE ANIMATION BACKGROUND - Remains static in viewport while foreground elements scroll */}
+      <div className="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden bg-black">
+        <MatrixRain
+          className="w-full h-full"
+          background="#000000"
+          color="#00FF66"
+          highlight="#FFFFFF"
+          fontSize={16}
+          density={0.85}
+          speed={0.85}
+          trail={0.88}
+          pointerResponse={false}
         />
-      </section>
+        {/* Subtle atmospheric vignette to guarantee foreground text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/45 to-black/90 pointer-events-none" />
+      </div>
 
-      {/* Minimal Footer */}
-      <footer className="mt-auto px-6 py-8 lg:px-8 bg-white border-t border-black/10 select-none">
-        <div className="mx-auto flex max-w-6xl flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="font-mono text-xs font-bold uppercase text-black/60">
-            &copy; 2026 kreepycode
-          </span>
-          <div className="flex items-center gap-6 text-xs font-mono font-bold uppercase tracking-wider text-black/60">
-            <Link href="/privacy" className="hover:text-black">
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className="hover:text-black">
-              Terms of Service
-            </Link>
+      {/* FOREGROUND SCROLLABLE CONTENT: Hero, Enrolled Courses, Courses Catalog, Footer */}
+      <div className="relative z-10 flex flex-col min-h-screen">
+        {/* Hero Section */}
+        <HeroWithMatrix
+          initialUser={user ? { id: user.id, email: user.email ?? "" } : null}
+          hasEnrollment={enrolledTrackIds.length > 0}
+          activeCourseSlug={activeCourseSlug}
+          activeDayNumber={activeDayNumber}
+          isCourseCompleted={isCourseCompleted}
+        />
+
+        {/* Tracks & Enrolled Courses Section - Scrolls smoothly over the fixed green background */}
+        <section id="tracks" className="relative z-10 w-full">
+          <CourseCatalogClient
+            courses={(courses as Course[]) ?? []}
+            tracks={(tracks as CourseTrack[]) ?? []}
+            enrolledTrackIds={enrolledTrackIds}
+            userEnrollments={userEnrollments}
+            activeEnrollmentCount={activeEnrollmentCount}
+            userEmail={user?.email}
+          />
+        </section>
+
+        {/* Minimal Footer */}
+        <footer className="mt-auto px-6 py-8 lg:px-8 bg-black/80 backdrop-blur-md border-t border-white/10 select-none">
+          <div className="mx-auto flex max-w-6xl flex-col sm:flex-row items-center justify-between gap-4">
+            <span className="font-mono text-xs font-bold uppercase text-neutral-400">
+              &copy; 2026 kreepycode
+            </span>
+            <div className="flex items-center gap-6 text-xs font-mono font-bold uppercase tracking-wider text-neutral-400">
+              <Link href="/privacy" className="hover:text-white transition-colors">
+                Privacy Policy
+              </Link>
+              <Link href="/terms" className="hover:text-white transition-colors">
+                Terms of Service
+              </Link>
+            </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
     </div>
   );
 }

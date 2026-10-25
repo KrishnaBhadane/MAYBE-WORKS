@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import type { AuthChangeEvent, Session, User as SupabaseUser } from "@supabase/supabase-js";
 import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
-import { User, Shield, Trophy } from "lucide-react";
+import { User, Shield } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 interface HeaderProps {
@@ -21,6 +21,7 @@ export function Header({ user = null }: HeaderProps) {
   const pathname = usePathname();
   const isHome = pathname === "/";
   const isWorkspace = /^\/learn\/[^/]+\/day\//.test(pathname) || /^\/contests\/[^/]+/.test(pathname);
+  const isAuthPage = pathname === "/login" || pathname === "/signin" || pathname === "/signup";
 
   const [currentUser, setCurrentUser] = useState<{ email: string; role?: string } | null>(
     user ? { email: user.email, role: user.role } : null
@@ -59,7 +60,8 @@ export function Header({ user = null }: HeaderProps) {
     };
   }, []);
 
-  if (isWorkspace) {
+  // Header disappears on workspace and auth pages (sign-in, login, signup)
+  if (isWorkspace || isAuthPage) {
     return null;
   }
 
@@ -70,23 +72,15 @@ export function Header({ user = null }: HeaderProps) {
       className={`w-full z-40 select-none transition-colors duration-200 ${
         isHome
           ? "absolute top-0 inset-x-0 bg-transparent border-none"
-          : "sticky top-0 border-b border-white/10 bg-black text-white"
+          : "relative border-b border-white/10 bg-black text-white"
       }`}
     >
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 sm:px-8">
         {/* Only the circular logo mark (no name) */}
         <Logo variant="mark" size="md" href="/" />
 
-        {/* Navigation Actions: Contests + Auth */}
+        {/* Navigation Actions: Auth & Profile */}
         <div className="flex items-center gap-3">
-          <Link
-            href="/contests"
-            prefetch={true}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/20 hover:border-[#FAFF00] hover:text-[#FAFF00] text-xs font-mono font-bold text-white transition-colors"
-          >
-            <Trophy className="w-3.5 h-3.5 text-[#FAFF00]" />
-            <span>Contests</span>
-          </Link>
 
           {currentUser ? (
             <div className="flex items-center gap-3">

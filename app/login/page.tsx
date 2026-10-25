@@ -148,14 +148,16 @@ function LoginForm() {
   return (
     <div className="w-full max-w-sm mx-auto">
       <div className="flex flex-col items-center mb-8">
-        <div className="w-16 h-16 rounded-full border border-white/20 bg-white p-1 mb-4 flex items-center justify-center shadow-lg">
+        <div className="w-16 h-16 rounded-full border-2 border-white/30 bg-white p-1 mb-4 flex items-center justify-center shadow-lg">
           <Image
-            src="/brand/kreepycode-logo.png"
+            src="/brand/kreepycode-mark.png"
             alt="kreepycode logo"
-            width={64}
-            height={64}
+            width={128}
+            height={128}
             priority
-            className="w-full h-full object-cover rounded-full"
+            quality={100}
+            unoptimized
+            className="w-full h-full object-contain p-0.5"
           />
         </div>
         <h1 className="text-2xl font-black text-white uppercase tracking-wider">

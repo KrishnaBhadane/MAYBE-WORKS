@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import { AntiMetalButton } from "@/components/ui/anti-metal-button";
-import { MatrixRain } from "@/components/ui/matrix-rain";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 interface HeroWithMatrixProps {
@@ -69,30 +68,8 @@ export function HeroWithMatrix({
     ? `/learn/${courseSlug}/day/${dayNumber}`
     : "/dashboard";
 
-  const roadmapHref = courseSlug
-    ? `/learn/${courseSlug}/roadmap`
-    : "/dashboard";
-
   return (
-    <section className="relative h-screen min-h-[600px] w-full flex flex-col items-center justify-center bg-black overflow-hidden select-none border-b-2 border-black">
-      {/* Full Background MatrixRain Canvas in Pure Black */}
-      <div className="absolute inset-0 w-full h-full z-0 opacity-80 pointer-events-auto">
-        <MatrixRain
-          className="w-full h-full"
-          background="#000000"
-          color="#FAFF00"
-          highlight="#FFFFFF"
-          fontSize={16}
-          density={0.85}
-          speed={0.85}
-          trail={0.88}
-          pointerResponse={true}
-        />
-      </div>
-
-      {/* Vignette Overlay for Depth & High Contrast */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/35 to-black/95 pointer-events-none z-1" />
-
+    <section className="relative h-screen min-h-[600px] w-full flex flex-col items-center justify-center bg-transparent overflow-hidden select-none">
       {/* Foreground Hero: kreepycode in exact vertical & horizontal center */}
       <div className="relative z-10 w-full flex flex-col items-center justify-center">
         {/* Container constrained to ~70% of screen width */}
@@ -140,16 +117,16 @@ export function HeroWithMatrix({
                 />
               </Link>
 
-              {/* Not logged in: Button 2 = Explore Tracks */}
-              <a href="#tracks">
+              {/* Not logged in: Button 2 = Contests */}
+              <Link href="/contests">
                 <AntiMetalButton
-                  label="Explore Tracks"
+                  label="Contests"
                   accentFrom="#FFFFFF"
                   accentTo="#E5E7EB"
                   dotColor="#000000"
                   className="min-w-[180px]"
                 />
-              </a>
+              </Link>
             </>
           ) : !isEnrolled ? (
             <>
@@ -164,10 +141,10 @@ export function HeroWithMatrix({
                 />
               </a>
 
-              {/* Logged in, not enrolled: Button 2 = Dashboard */}
-              <Link href="/dashboard">
+              {/* Logged in, not enrolled: Button 2 = Contests */}
+              <Link href="/contests">
                 <AntiMetalButton
-                  label="Dashboard"
+                  label="Contests"
                   accentFrom="#FFFFFF"
                   accentTo="#E5E7EB"
                   dotColor="#000000"
@@ -188,10 +165,10 @@ export function HeroWithMatrix({
                 />
               </a>
 
-              {/* Course Completed: Button 2 = Completed */}
-              <Link href={roadmapHref}>
+              {/* Course Completed: Button 2 = Contests */}
+              <Link href="/contests">
                 <AntiMetalButton
-                  label="Completed"
+                  label="Contests"
                   accentFrom="#FFFFFF"
                   accentTo="#E5E7EB"
                   dotColor="#000000"
@@ -212,10 +189,10 @@ export function HeroWithMatrix({
                 />
               </Link>
 
-              {/* Logged in, already enrolled: Button 2 = Roadmap */}
-              <Link href={roadmapHref}>
+              {/* Logged in, already enrolled: Button 2 = Contests (Placed in Hero per user request) */}
+              <Link href="/contests">
                 <AntiMetalButton
-                  label="View Roadmap"
+                  label="Contests"
                   accentFrom="#FFFFFF"
                   accentTo="#E5E7EB"
                   dotColor="#000000"

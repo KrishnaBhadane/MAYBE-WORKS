@@ -61,10 +61,10 @@ function createColumn(index: number): Column {
 export function MatrixRain({
   "aria-hidden": ariaHidden = true,
   "aria-label": ariaLabel = "Animated field of falling code tokens",
-  background = "#0A1128", // kreepycode brand deep navy
+  background = "#000000", // pure black background
   characters = defaultCharacters,
   className,
-  color = "#FAFF00", // kreepycode brand lemon yellow
+  color = "#00FF66", // terminal matrix green
   density = 0.85,
   fontSize = 16,
   glow = 4,
